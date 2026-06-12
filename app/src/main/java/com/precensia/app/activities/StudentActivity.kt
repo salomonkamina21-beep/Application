@@ -25,20 +25,40 @@ class StudentActivity : AppCompatActivity() {
     }
 
     private fun loadTodayAttendance() {
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        db.collection("attendance").document(date).get()
-            .addOnSuccessListener { doc ->
-                val sheet = doc.toObject(AttendanceSheet::class.java)
-                sheet?.let {
-                    val adapter = AttendanceAdapter(it.records.toMutableList(), false)
-                    binding.rvStudents.layoutManager = LinearLayoutManager(this)
-                    binding.rvStudents.adapter = adapter
+        val currentUserUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        
+        // Amélioration : Charger l'historique complet des fiches validées pour cet étudiant
+        db.collection("attendance")
+            .whereEqualTo("isValidated", true)
+            .orderBy("id", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                val myAttendanceList = mutableListOf<com.precensia.app.models.AttendanceRecord>()
+                var presentCount = 0
+                var totalSessions = 0
+
+                for (doc in documents) {
+                    val sheet = doc.toObject(AttendanceSheet::class.java)
+                    val myRecord = sheet.records.find { it.studentId == currentUserUid }
                     
-                    val status = if (it.isValidated) "Validée" else "En attente de validation"
-                    binding.tvStatus.text = "Statut: $status"
-                } ?: run {
-                    Toast.makeText(this, "Fiche non encore disponible", Toast.LENGTH_SHORT).show()
+                    myRecord?.let {
+                        // On réutilise l'adapter mais en affichant seulement nos records
+                        // On pourrait créer un adapter spécifique pour l'historique étudiant
+                        myAttendanceList.add(it.copy(studentName = "${sheet.date} - ${it.status}"))
+                        if (it.status == "PRESENT") presentCount++
+                        totalSessions++
+                    }
                 }
+
+                val adapter = AttendanceAdapter(myAttendanceList, false)
+                binding.rvStudents.layoutManager = LinearLayoutManager(this)
+                binding.rvStudents.adapter = adapter
+                
+                val rate = if (totalSessions > 0) (presentCount * 100 / totalSessions) else 0
+                binding.tvStatus.text = "Taux de présence : $rate% ($presentCount/$totalSessions)"
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Erreur lors du chargement de l'historique", Toast.LENGTH_SHORT).show()
             }
     }
 }

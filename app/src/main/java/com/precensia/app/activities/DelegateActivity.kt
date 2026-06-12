@@ -53,24 +53,30 @@ class DelegateActivity : AppCompatActivity() {
     }
 
     private fun submitAttendance() {
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val timestamp = System.currentTimeMillis()
+        val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(timestamp))
+        val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         
+        // Amélioration : L'ID est maintenant unique par session (date + timestamp)
+        // Cela permet plusieurs cours le même jour.
+        val sheetId = "session_${timestamp}"
+        
         val sheet = AttendanceSheet(
-            id = date,
-            date = date,
-            records = studentList,
+            id = sheetId,
+            date = "$date ($time)",
+            records = adapter.getRecords(), // Récupérer les données mises à jour de l'adapter
             isValidated = false,
             submittedBy = uid
         )
 
-        db.collection("attendance").document(date).set(sheet)
+        db.collection("attendance").document(sheetId).set(sheet)
             .addOnSuccessListener {
-                Toast.makeText(this, "Fiche envoyée au professeur", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Fiche de présence soumise avec succès", Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Erreur: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Échec de l'envoi : ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }

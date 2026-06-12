@@ -31,27 +31,41 @@ class ProfessorActivity : AppCompatActivity() {
     }
 
     private fun loadTodayAttendance() {
-        val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-        db.collection("attendance").document(date).get()
-            .addOnSuccessListener { doc ->
-                currentSheet = doc.toObject(AttendanceSheet::class.java)
-                currentSheet?.let { sheet ->
-                    adapter = AttendanceAdapter(sheet.records.toMutableList(), true)
-                    binding.rvStudents.layoutManager = LinearLayoutManager(this)
-                    binding.rvStudents.adapter = adapter
-                } ?: run {
-                    Toast.makeText(this, "Aucune fiche pour aujourd'hui", Toast.LENGTH_SHORT).show()
+        // Amélioration : Charger toutes les fiches non validées au lieu d'une seule par date fixe
+        db.collection("attendance")
+            .whereEqualTo("isValidated", false)
+            .limit(1) // Pour l'instant on traite la plus ancienne en attente
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val doc = documents.documents[0]
+                    currentSheet = doc.toObject(AttendanceSheet::class.java)
+                    currentSheet?.let { sheet ->
+                        adapter = AttendanceAdapter(sheet.records.toMutableList(), true)
+                        binding.rvStudents.layoutManager = LinearLayoutManager(this)
+                        binding.rvStudents.adapter = adapter
+                        binding.tvTitle.text = "Validation : ${sheet.date}"
+                    }
+                } else {
+                    Toast.makeText(this, "Aucune fiche en attente de validation", Toast.LENGTH_SHORT).show()
                 }
             }
     }
 
     private fun validateAttendance() {
         currentSheet?.let { sheet ->
-            val updatedSheet = sheet.copy(isValidated = true, records = adapter.getRecords())
-            db.collection("attendance").document(sheet.date).set(updatedSheet)
+            val updatedSheet = sheet.copy(
+                isValidated = true, 
+                records = adapter.getRecords()
+            )
+            // Utiliser l'ID réel du document pour la mise à jour
+            db.collection("attendance").document(sheet.id).set(updatedSheet)
                 .addOnSuccessListener {
-                    Toast.makeText(this, "Fiche validée et enregistrée", Toast.LENGTH_SHORT).show()
-                    finish()
+                    Toast.makeText(this, "Fiche validée avec succès", Toast.LENGTH_SHORT).show()
+                    loadTodayAttendance() // Charger la suivante s'il y en a une
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Erreur de validation : ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
     }
