@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1031348183541",
+    "project_id": "precensia-a5988",
+    "storage_bucket": "precensia-a5988.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031348183541:android:fc56692b70368ffd6c80bc",
+        "android_client_info": {
+          "package_name": "com.precensia.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtkOkxEutkbaJpCgj0THVwxxT_A-HQq9w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.precensia.app-merged_res-33:/layout_activity_login.xml.flat",
+        "source": "com.precensia.app-main-35:/layout/activity_login.xml"
+    },
+    {
+        "merged": "com.precensia.app-merged_res-33:/layout_activity_delegate.xml.flat",
+        "source": "com.precensia.app-main-35:/layout/activity_delegate.xml"
+    },
+    {
+        "merged": "com.precensia.app-merged_res-33:/layout_item_attendance.xml.flat",
+        "source": "com.precensia.app-main-35:/layout/item_attendance.xml"
+    },
+    {
+        "merged": "com.precensia.app-merged_res-33:/layout_activity_professor.xml.flat",
+        "source": "com.precensia.app-main-35:/layout/activity_professor.xml"
+    },
+    {
+        "merged": "com.precensia.app-merged_res-33:/layout_activity_student.xml.flat",
+        "source": "com.precensia.app-main-35:/layout/activity_student.xml"
+    }
+]
