@@ -3,32 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:background="@color/backgroundColor">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fiche de présence (Délégué)"
-        android:textSize="20sp"
-        android:textStyle="bold"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryColor"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:title="Fiche de Présence"
+        app:titleTextColor="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvStudents"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintBottom_toTopOf="@id/btnSubmit"/>
+        android:paddingHorizontal="8dp"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toTopOf="@id/btnContainer"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    <Button
-        android:id="@+id/btnSubmit"
+    <LinearLayout
+        android:id="@+id/btnContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Envoyer au professeur"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:background="@color/white"
+        android:elevation="16dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Envoyer au professeur"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            style="@style/ModernButton" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
